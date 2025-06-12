@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Layout from "./layouts/Layout";
 import Containers from "./pages/Containers";
-import CreateContainerForm from "./components/CreateContainerForm";
+import CreateContainerForm from "./pages/CreateContainerForm";
 
 function App() {
   return (
