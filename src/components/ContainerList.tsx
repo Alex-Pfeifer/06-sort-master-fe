@@ -30,7 +30,6 @@ const ContainerList = () => {
         })
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to delete container");
-                // Удаляем контейнер из состояния
                 setContainers((prev) => prev.filter((container) => container.id !== id));
                 setMessage("Container successfully deleted.");
             })
