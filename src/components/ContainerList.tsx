@@ -11,7 +11,7 @@ const ContainerList = () => {
     const [containers, setContainers] = useState<Container[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
-    const [newItemName, setNewItemName] = useState<{ [key: string]: string }>({}); // для каждого контейнера отдельное поле
+    const [newItemName, setNewItemName] = useState<{ [key: string]: string }>({});
 
     useEffect(() => {
         fetch("/api/containers")
