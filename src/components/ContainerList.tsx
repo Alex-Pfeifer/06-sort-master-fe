@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 interface Container {
     id: string;
@@ -11,6 +11,7 @@ const ContainerList = () => {
     const [containers, setContainers] = useState<Container[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
+    const [newItemName, setNewItemName] = useState<{ [key: string]: string }>({}); // для каждого контейнера отдельное поле
 
     useEffect(() => {
         fetch("/api/containers")
@@ -25,15 +26,46 @@ const ContainerList = () => {
     const handleDelete = (id: string) => {
         setError(null);
         setMessage(null);
-        fetch(`/api/containers/${id}`, {
-            method: "DELETE",
-        })
+        fetch(`/api/containers/${id}`, { method: "DELETE" })
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to delete container");
                 setContainers((prev) => prev.filter((container) => container.id !== id));
                 setMessage("Container successfully deleted.");
             })
             .catch(() => setError("Error deleting container."));
+    };
+
+    const handleAddItem = (e: FormEvent, containerId: string) => {
+        e.preventDefault();
+        setError(null);
+        setMessage(null);
+
+        const itemName = newItemName[containerId]?.trim();
+        if (!itemName) {
+            setError("Item name cannot be empty.");
+            return;
+        }
+
+        fetch(`/api/containers/${containerId}/items`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: itemName }),
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to add item");
+                return res.json();
+            })
+            .then((newItem) => {
+                setMessage(`Item "${newItem.name}" added to container.`);
+                setNewItemName((prev) => ({ ...prev, [containerId]: "" }));
+            })
+            .catch(() => setError("Error adding item."));
+    };
+
+    const handleInputChange = (containerId: string, value: string) => {
+        setNewItemName((prev) => ({ ...prev, [containerId]: value }));
     };
 
     if (error)
@@ -59,6 +91,25 @@ const ContainerList = () => {
                         </button>
                         <h3 className="text-xl font-semibold">{container.name}</h3>
                         <p>{container.description}</p>
+
+                        <form
+                            className="mt-6 bg-red-400 bg-opacity-90 p-3 rounded shadow-md max-w-md"
+                            onSubmit={(e) => handleAddItem(e, container.id)}
+                        >
+                            <input
+                                type="text"
+                                placeholder="New item name"
+                                value={newItemName[container.id] || ""}
+                                onChange={(e) => handleInputChange(container.id, e.target.value)}
+                                className="rounded p-3 mr-6 w-full text-black placeholder-gray-950 border border-b-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <button
+                                type="submit"
+                                className="mt-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded"
+                            >
+                                Add Item
+                            </button>
+                        </form>
                     </li>
                 ))}
             </ul>
