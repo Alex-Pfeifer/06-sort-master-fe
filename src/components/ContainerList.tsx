@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Container {
   id: string;
@@ -97,7 +97,7 @@ const ContainerList = () => {
               </button>
             </div>
 
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 space-y-2 input-group mask-b-from-9">
               <input
                 type="text"
                 placeholder="New item name"
